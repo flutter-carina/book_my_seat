@@ -23,32 +23,37 @@ class SeatLayoutWidget extends StatelessWidget {
       boundaryMargin: const EdgeInsets.all(8),
       constrained: true,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ...List<int>.generate(stateModel.rows, (rowI) => rowI)
-              .map<Row>(
-                (rowI) => Row(
-                  children: [
-                    ...List<int>.generate(stateModel.cols, (colI) => colI)
-                        .map<SeatWidget>((colI) => SeatWidget(
-                              model: SeatModel(
-                                seatState: stateModel.currentSeatsState[rowI]
-                                    [colI],
-                                rowI: rowI,
-                                colI: colI,
-                                seatSvgSize: stateModel.seatSvgSize,
-                                pathSelectedSeat: stateModel.pathSelectedSeat,
-                                pathDisabledSeat: stateModel.pathDisabledSeat,
-                                pathSoldSeat: stateModel.pathSoldSeat,
-                                pathUnSelectedSeat:
-                                    stateModel.pathUnSelectedSeat,
-                              ),
-                              onSeatStateChanged: onSeatStateChanged,
-                            ))
-                        .toList()
-                  ],
-                ),
-              )
-              .toList()
+              .map<Row>((rowI) {
+            int seatNumber = 0;
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ...List<int>.generate(stateModel.cols, (colI) => colI)
+                    .map<SeatWidget>((colI) => SeatWidget(
+                          model: SeatModel(
+                            seatState: stateModel.currentSeatsState[rowI][colI],
+                            rowI: rowI,
+                            colI: colI,
+                            seatSvgSize: stateModel.seatSvgSize,
+                            pathSelectedSeat: stateModel.pathSelectedSeat,
+                            pathDisabledSeat: stateModel.pathDisabledSeat,
+                            pathSoldSeat: stateModel.pathSoldSeat,
+                            pathUnSelectedSeat: stateModel.pathUnSelectedSeat,
+                          ),
+                          onSeatStateChanged: onSeatStateChanged,
+                          seatNumber: stateModel.currentSeatsState[rowI]
+                                      [colI] !=
+                                  SeatState.empty
+                              ? (++seatNumber)
+                              : null,
+                        ))
+                    .toList()
+              ],
+            );
+          }).toList()
         ],
       ),
     );

@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class SeatWidget extends StatefulWidget {
   final SeatModel model;
+  final int? seatNumber;
   final void Function(int rowI, int colI, SeatState currentState)
       onSeatStateChanged;
 
@@ -12,6 +13,7 @@ class SeatWidget extends StatefulWidget {
     Key? key,
     required this.model,
     required this.onSeatStateChanged,
+    this.seatNumber,
   }) : super(key: key);
 
   @override
@@ -35,6 +37,7 @@ class _SeatWidgetState extends State<SeatWidget> {
   Widget build(BuildContext context) {
     final safeCheckedSeatState = seatState;
     if (safeCheckedSeatState != null) {
+      
       return GestureDetector(
         onTapUp: (_) {
           switch (seatState) {
@@ -63,11 +66,26 @@ class _SeatWidgetState extends State<SeatWidget> {
           }
         },
         child: seatState != SeatState.empty
-            ? SvgPicture.asset(
-                _getSvgPath(safeCheckedSeatState),
-                height: widget.model.seatSvgSize.toDouble(),
-                width: widget.model.seatSvgSize.toDouble(),
-                fit: BoxFit.cover,
+            ? Stack(
+                alignment: Alignment.center,
+                children: [
+                  SvgPicture.asset(
+                    _getSvgPath(safeCheckedSeatState),
+                    height: widget.model.seatSvgSize.toDouble(),
+                    width: widget.model.seatSvgSize.toDouble(),
+                    fit: BoxFit.cover,
+                  ),
+                  if (widget.seatNumber != null)
+                  Text(
+                    widget.seatNumber.toString(),
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               )
             : SizedBox(
                 height: widget.model.seatSvgSize.toDouble(),
