@@ -93,9 +93,9 @@ class _SeatWidgetState extends State<SeatWidget> {
     return Text(
       '$rowLabel$seatNumber',
       style: const TextStyle(
-        fontSize: 3,
+        fontSize: 4,
         fontWeight: FontWeight.w500,
-        color: Colors.black,
+        color: Colors.white,
       ),
       textAlign: TextAlign.center,
     );

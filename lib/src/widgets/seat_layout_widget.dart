@@ -23,6 +23,8 @@ class SeatLayoutWidget extends StatefulWidget {
 }
 
 class _SeatLayoutWidgetState extends State<SeatLayoutWidget> {
+  final TransformationController _transformationController =
+      TransformationController(Matrix4.identity()..scale(2.0));
   Map<int, String> get rowLabelMap {
     return computeRowLabels(widget.stateModel.currentSeatsState);
   }
@@ -35,8 +37,7 @@ class _SeatLayoutWidgetState extends State<SeatLayoutWidget> {
       child: InteractiveViewer(
         maxScale: 5,
         minScale: 0.8,
-        transformationController:
-            TransformationController(Matrix4.identity()..scale(2.5)),
+        transformationController: _transformationController,
         boundaryMargin: const EdgeInsets.all(8),
         constrained: true,
         child: Column(
@@ -46,27 +47,40 @@ class _SeatLayoutWidgetState extends State<SeatLayoutWidget> {
             final hasVisibleSeat = widget.stateModel.currentSeatsState[rowI]
                 .any((seat) => seat != SeatState.empty);
 
+            Plan? matchingPlan;
+            for (var plan in widget.plans) {
+              if (plan.startRow == rowI) {
+                matchingPlan = plan;
+                break;
+              }
+            }
+
             return Column(
               children: [
-                Visibility(
-                  visible: widget.plans.any((plan) => plan.startRow == rowI),
-                  child: Padding(
+                if (matchingPlan != null) ...[
+                  Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "This is recliner",
-                          style: TextStyle(fontSize: 4),
+                        Center(
+                          child: Text(
+                            matchingPlan.label,
+                            style: const TextStyle(
+                              fontSize: 7,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
                         ),
                         Divider(
                           height: 1,
-                          color: Colors.grey.shade300,
+                          color: Colors.grey.shade500,
                         ),
                       ],
                     ),
                   ),
-                ),
+                ],
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -82,6 +96,7 @@ class _SeatLayoutWidgetState extends State<SeatLayoutWidget> {
                                 style: const TextStyle(
                                   fontSize: 8,
                                   fontWeight: FontWeight.w400,
+                                  color: Colors.black,
                                 ),
                               )
                             : const SizedBox.shrink(),
@@ -94,26 +109,29 @@ class _SeatLayoutWidgetState extends State<SeatLayoutWidget> {
                           widget.stateModel.currentSeatsState[rowI][colI];
                       return Column(
                         children: [
-                          SeatWidget(
-                            model: SeatModel(
-                              seatState: seatState,
-                              rowI: rowI,
-                              colI: colI,
-                              seatSvgSize: widget.stateModel.seatSvgSize,
-                              pathSelectedSeat:
-                                  widget.stateModel.pathSelectedSeat,
-                              pathDisabledSeat:
-                                  widget.stateModel.pathDisabledSeat,
-                              pathSoldSeat: widget.stateModel.pathSoldSeat,
-                              pathUnSelectedSeat:
-                                  widget.stateModel.pathUnSelectedSeat,
+                          Padding(
+                            padding: EdgeInsets.all(0.5),
+                            child: SeatWidget(
+                              model: SeatModel(
+                                seatState: seatState,
+                                rowI: rowI,
+                                colI: colI,
+                                seatSvgSize: widget.stateModel.seatSvgSize,
+                                pathSelectedSeat:
+                                    widget.stateModel.pathSelectedSeat,
+                                pathDisabledSeat:
+                                    widget.stateModel.pathDisabledSeat,
+                                pathSoldSeat: widget.stateModel.pathSoldSeat,
+                                pathUnSelectedSeat:
+                                    widget.stateModel.pathUnSelectedSeat,
+                              ),
+                              rowLabelMap: rowLabelMap,
+                              onSeatStateChanged: widget.onSeatStateChanged,
+                              seatNumber: seatState != SeatState.empty
+                                  ? (++seatNumber)
+                                  : null,
                             ),
-                            rowLabelMap: rowLabelMap,
-                            onSeatStateChanged: widget.onSeatStateChanged,
-                            seatNumber: seatState != SeatState.empty
-                                ? (++seatNumber)
-                                : null,
-                          ),
+                          )
                         ],
                       );
                     }),
