@@ -1,4 +1,5 @@
 import 'package:book_my_seat/book_my_seat.dart';
+import 'package:book_my_seat/src/model/plan_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -44,6 +45,18 @@ class _MyAppState extends State<MyApp> {
                 width: double.maxFinite,
                 height: 500,
                 child: SeatLayoutWidget(
+                  plans: [
+                    Plan(
+                      label: "Plan A",
+                      startRow: 0,
+                      endRow: 3,
+                    ),
+                    Plan(
+                      label: "Plan B",
+                      startRow: 4,
+                      endRow: 6,
+                    ),
+                  ],
                   onSeatStateChanged: (rowI, colI, seatState) {
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -945,7 +958,8 @@ class _MyAppState extends State<MyApp> {
               },
               child: const Text('Show my selected seat numbers'),
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.resolveWith((states) => const Color(0xFFfc4c4e)),
+                backgroundColor: MaterialStateProperty.resolveWith(
+                    (states) => const Color(0xFFfc4c4e)),
               ),
             ),
             const SizedBox(height: 12),
@@ -965,7 +979,8 @@ class SeatNumber {
 
   @override
   bool operator ==(Object other) {
-    return rowI == (other as SeatNumber).rowI && colI == (other as SeatNumber).colI;
+    return rowI == (other as SeatNumber).rowI &&
+        colI == (other as SeatNumber).colI;
   }
 
   @override

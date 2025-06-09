@@ -9,10 +9,13 @@ class SeatWidget extends StatefulWidget {
   final void Function(int rowI, int colI, SeatState currentState)
       onSeatStateChanged;
 
+  final Map<int, String> rowLabelMap;
+
   const SeatWidget({
     Key? key,
     required this.model,
     required this.onSeatStateChanged,
+    required this.rowLabelMap,
     this.seatNumber,
   }) : super(key: key);
 
@@ -36,32 +39,27 @@ class _SeatWidgetState extends State<SeatWidget> {
   @override
   Widget build(BuildContext context) {
     final safeCheckedSeatState = seatState;
+
     if (safeCheckedSeatState != null) {
-      
       return GestureDetector(
         onTapUp: (_) {
           switch (seatState) {
             case SeatState.selected:
-              {
-                setState(() {
-                  seatState = SeatState.unselected;
-                  widget.onSeatStateChanged(rowI, colI, SeatState.unselected);
-                });
-              }
+              setState(() {
+                seatState = SeatState.unselected;
+                widget.onSeatStateChanged(rowI, colI, SeatState.unselected);
+              });
               break;
             case SeatState.unselected:
-              {
-                setState(() {
-                  seatState = SeatState.selected;
-                  widget.onSeatStateChanged(rowI, colI, SeatState.selected);
-                });
-              }
+              setState(() {
+                seatState = SeatState.selected;
+                widget.onSeatStateChanged(rowI, colI, SeatState.selected);
+              });
               break;
             case SeatState.disabled:
             case SeatState.sold:
             case SeatState.empty:
             default:
-              {}
               break;
           }
         },
@@ -75,16 +73,7 @@ class _SeatWidgetState extends State<SeatWidget> {
                     width: widget.model.seatSvgSize.toDouble(),
                     fit: BoxFit.cover,
                   ),
-                  if (widget.seatNumber != null)
-                  Text(
-                    widget.seatNumber.toString(),
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 5,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                  if (seatState == SeatState.selected) _buildSeatLabel(),
                 ],
               )
             : SizedBox(
@@ -93,32 +82,38 @@ class _SeatWidgetState extends State<SeatWidget> {
               ),
       );
     }
+
     return const SizedBox();
+  }
+
+  Widget _buildSeatLabel() {
+    final rowLabel = widget.rowLabelMap[rowI] ?? '';
+    final seatNumber = widget.seatNumber!;
+
+    return Text(
+      '$rowLabel$seatNumber',
+      style: const TextStyle(
+        fontSize: 3,
+        fontWeight: FontWeight.w500,
+        color: Colors.black,
+      ),
+      textAlign: TextAlign.center,
+    );
   }
 
   String _getSvgPath(SeatState state) {
     switch (state) {
       case SeatState.unselected:
-        {
-          return widget.model.pathUnSelectedSeat;
-        }
+        return widget.model.pathUnSelectedSeat;
       case SeatState.selected:
-        {
-          return widget.model.pathSelectedSeat;
-        }
+        return widget.model.pathSelectedSeat;
       case SeatState.disabled:
-        {
-          return widget.model.pathDisabledSeat;
-        }
+        return widget.model.pathDisabledSeat;
       case SeatState.sold:
-        {
-          return widget.model.pathSoldSeat;
-        }
+        return widget.model.pathSoldSeat;
       case SeatState.empty:
       default:
-        {
-          return widget.model.pathDisabledSeat;
-        }
+        return widget.model.pathDisabledSeat;
     }
   }
 }
